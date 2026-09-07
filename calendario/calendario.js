@@ -104,16 +104,23 @@ function renderCalendar() {
     if (dayTasks.length > 0) {
       const chipsWrap = document.createElement('div');
       chipsWrap.className = 'cal-chips';
-      dayTasks.forEach((t) => chipsWrap.appendChild(buildChip(t)));
-      cell.appendChild(chipsWrap);
 
-      const more = dayTasks.length - 3;
-      if (more > 0) {
+      // Mostrar como máximo 3 chips directamente; el resto se resume en "+N más".
+      const MAX_CHIPS = 3;
+      const visibles = dayTasks.slice(0, MAX_CHIPS);
+      const restantes = dayTasks.length - MAX_CHIPS;
+
+      visibles.forEach((t) => chipsWrap.appendChild(buildChip(t)));
+
+      // Solo se añade "+N más" si quedan tareas sin mostrar (nunca para 0-3).
+      if (restantes > 0) {
         const moreEl = document.createElement('div');
         moreEl.className = 'cal-more';
-        moreEl.textContent = `+${more} más`;
+        moreEl.textContent = `+${restantes} más`;
         chipsWrap.appendChild(moreEl);
       }
+
+      cell.appendChild(chipsWrap);
     }
 
     calendarGrid.appendChild(cell);

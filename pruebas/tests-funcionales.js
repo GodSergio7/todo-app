@@ -280,6 +280,13 @@ function renderCalendarioMonth(seed, date) {
       const chipsWrap = cell && cell.children[1];
       if (!chipsWrap) return [];
       return chipsWrap.children.filter((c) => (c.className || '').indexOf('cal-chip') !== -1);
+    },
+    // Devuelve el texto del indicador "+N más" de una celda (o null si no hay).
+    moreOf: function (cell) {
+      const chipsWrap = cell && cell.children[1];
+      if (!chipsWrap) return null;
+      const more = chipsWrap.children.find((c) => (c.className || '').indexOf('cal-more') !== -1);
+      return more ? more._text : null;
     }
   };
 }
@@ -363,6 +370,67 @@ function renderCalendarioMonth(seed, date) {
   check(cal.els['modal-backdrop'].hidden === true, 'cerrar modal funciona');
 
   check(cal.cellByDay(30) !== null, 'el calendario sigue mostrando todos los días del mes');
+}
+
+// ============================================================================
+// LÍMITE DE CHIPS POR DÍA ("+N más")
+// ============================================================================
+console.log('\n=== Calendario: límite de chips por día ===');
+{
+  // Tareas repartidas para probar 0, 1, 3, 4 y 5 tareas en un mismo día.
+  const seed = JSON.stringify([
+    // Día 10: 5 tareas -> 3 chips + "+2 más"
+    { id: 100, text: 'D10-a', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-10' },
+    { id: 101, text: 'D10-b', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-10' },
+    { id: 102, text: 'D10-c', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-10' },
+    { id: 103, text: 'D10-d', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-10' },
+    { id: 104, text: 'D10-e', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-10' },
+    // Día 11: 4 tareas -> 3 chips + "+1 más"
+    { id: 200, text: 'D11-a', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-11' },
+    { id: 201, text: 'D11-b', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-11' },
+    { id: 202, text: 'D11-c', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-11' },
+    { id: 203, text: 'D11-d', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-11' },
+    // Día 12: 3 tareas -> 3 chips y sin "+N más"
+    { id: 300, text: 'D12-a', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-12' },
+    { id: 301, text: 'D12-b', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-12' },
+    { id: 302, text: 'D12-c', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-12' },
+    // Día 14: 1 tarea -> 1 chip y sin "+N más"
+    { id: 400, text: 'D14-a', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-14' }
+    // Día 13 queda sin tareas (0 tareas)
+  ]);
+  const cal = renderCalendarioMonth(seed, '2026-09-06');
+
+  // 5 tareas -> 3 chips + "+2 más"
+  const d10 = cal.cellByDay(10);
+  check(cal.chipsOf(d10).length === 3, '5 tareas -> se muestran 3 chips');
+  check(cal.moreOf(d10) === '+2 más', '5 tareas -> indicador "+2 más"');
+
+  // 4 tareas -> 3 chips + "+1 más"
+  const d11 = cal.cellByDay(11);
+  check(cal.chipsOf(d11).length === 3, '4 tareas -> se muestran 3 chips');
+  check(cal.moreOf(d11) === '+1 más', '4 tareas -> indicador "+1 más"');
+
+  // 3 tareas -> 3 chips y NO aparece "+N más"
+  const d12 = cal.cellByDay(12);
+  check(cal.chipsOf(d12).length === 3, '3 tareas -> se muestran 3 chips');
+  check(cal.moreOf(d12) === null, '3 tareas -> no aparece "+N más"');
+
+  // 0 tareas -> sin chips y sin "+N más"
+  const d13 = cal.cellByDay(13);
+  check(cal.chipsOf(d13).length === 0, '0 tareas -> no hay chips');
+  check(cal.moreOf(d13) === null, '0 tareas -> no aparece "+N más"');
+
+  // 1 tarea -> 1 chip y sin "+N más"
+  const d14 = cal.cellByDay(14);
+  check(cal.chipsOf(d14).length === 1, '1 tarea -> se muestra 1 chip');
+  check(cal.moreOf(d14) === null, '1 tarea -> no aparece "+N más"');
+
+  // Las tareas no mostradas no deben existir como botones interactivos.
+  const textosD10 = cal.chipsOf(d10).map((c) => c._text);
+  check(textosD10.indexOf('D10-d') === -1 && textosD10.indexOf('D10-e') === -1,
+    'las tareas 4ª y 5ª del día no se renderizan como chips');
+  const textosD11 = cal.chipsOf(d11).map((c) => c._text);
+  check(textosD11.indexOf('D11-d') === -1, 'la 4ª tarea del día no se renderiza como chip');
 }
 
 console.log(fails === 0
