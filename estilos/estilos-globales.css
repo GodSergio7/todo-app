@@ -1,0 +1,271 @@
+/* =============================================================
+   Estilos globales compartidos por todas las páginas
+   (base, layout, cabecera, reloj, navegación y elementos comunes)
+   ============================================================= */
+
+:root {
+  --bg-primary: #2D1B69;
+  --bg-secondary: #1E1246;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --accent-lime: #C8FF3D;
+  --accent-lime-hover: #b5eb29;
+  --accent-lime-glow: rgba(200, 255, 61, 0.3);
+  --text-primary: #FFFFFF;
+  --text-secondary: #A79BCE;
+  --text-muted: #796AAB;
+  --border-color: rgba(255, 255, 255, 0.12);
+  --border-focus: #C8FF3D;
+  --danger-color: #FF5555;
+  --danger-bg-hover: rgba(255, 85, 85, 0.15);
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-digital: 'Chakra Petch', 'JetBrains Mono', 'Fira Mono', monospace;
+  --shadow-main: 0 20px 50px rgba(15, 8, 38, 0.6);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* El atributo hidden debe ocultar siempre, incluso si el elemento tiene un
+   display propio (p. ej. .modal-backdrop con display: grid). */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(circle at 50% 0%, #432896 0%, var(--bg-primary) 65%, #160D38 100%);
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 3rem 1rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Fondo decorativo con resplandor ambiental */
+.bg-glow {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(200, 255, 61, 0.12) 0%, rgba(45, 27, 105, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 540px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-main);
+  padding: 2.25rem 2rem;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Reloj y fecha (componente reloj) ---------- */
+/* Reloj centrado, justo encima del contenido principal: sin tarjeta,
+   sin fondo ni borde. La hora es el elemento protagonista y la fecha
+   aparece debajo con menor tamaño. */
+.clock-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.75rem;
+  line-height: 1.05;
+  animation: clockFadeIn 0.6s ease-out;
+}
+
+@keyframes clockFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.clock-time {
+  font-family: var(--font-digital);
+  font-size: 3.2rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: var(--accent-lime);
+  text-shadow: 0 0 22px rgba(200, 255, 61, 0.22);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Segundos: más pequeños y con un parpadeo sutil (efecto "en vivo") */
+.clock-time .seconds {
+  font-size: 0.55em;
+  font-weight: 500;
+  opacity: 0.85;
+  color: #d9ff9b;
+  animation: tick 1s steps(1) infinite;
+}
+
+@keyframes tick {
+  0%, 50% {
+    opacity: 1;
+  }
+  50.01%, 100% {
+    opacity: 0.35;
+  }
+}
+
+.clock-date {
+  font-family: var(--font-family);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  margin-top: 0.4rem;
+}
+
+/* Puntos de montaje de componentes: no ocupan espacio propio */
+.reloj-montaje,
+.nav-montaje {
+  display: contents;
+}
+
+/* ---------- Cabecera ---------- */
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.app-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+/* ---------- Navegación entre páginas (componente navegacion) ---------- */
+.page-nav {
+  display: inline-flex;
+  gap: 0.25rem;
+  background: rgba(15, 8, 38, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 0.3rem;
+  margin-bottom: 1.1rem;
+}
+
+.page-nav-link {
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 0.45rem 1.2rem;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  letter-spacing: 0.2px;
+}
+
+.page-nav-link:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.page-nav-link.active {
+  color: #1A0F40;
+  background: var(--accent-lime);
+  box-shadow: 0 2px 10px rgba(200, 255, 61, 0.3);
+}
+
+/* ---------- Botones y elementos compartidos ---------- */
+.btn-delete {
+  background: rgba(255, 85, 85, 0.1);
+  color: var(--danger-color);
+  border: 1px solid rgba(255, 85, 85, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.825rem;
+  font-weight: 600;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 0.75rem;
+  flex-shrink: 0;
+}
+
+.btn-delete:hover {
+  background: var(--danger-color);
+  color: #FFFFFF;
+  border-color: var(--danger-color);
+  box-shadow: 0 2px 10px rgba(255, 85, 85, 0.3);
+}
+
+/* ============================================================= */
+/* Responsive global (afecta a elementos compartidos)            */
+/* ============================================================= */
+
+/* Móviles: se reduce el tamaño de la hora para que no domine la pantalla */
+@media (max-width: 680px) {
+  .clock-time {
+    font-size: 2.6rem;
+  }
+}
+
+@media (max-width: 520px) {
+  body {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .container {
+    padding: 1.5rem 1.25rem;
+    border-radius: 16px;
+  }
+
+  .app-header h1 {
+    font-size: 1.65rem;
+  }
+
+  .clock-widget {
+    margin-bottom: 1.25rem;
+  }
+
+  .clock-time {
+    font-size: 2.1rem;
+    letter-spacing: 2px;
+  }
+
+  .clock-date {
+    font-size: 0.78rem;
+    margin-top: 0.3rem;
+  }
+}

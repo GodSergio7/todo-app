@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis tareas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../estilos/estilos-globales.css">
+  <link rel="stylesheet" href="tareas.css">
+</head>
+<body>
+  <div class="bg-glow"></div>
+
+  <div class="container container-tareas">
+    <header class="app-header">
+      <div class="nav-montaje" data-nav-montaje data-activa="tareas"></div>
+
+      <h1>Mis tareas</h1>
+    </header>
+
+    <main class="app-body">
+      <div class="reloj-montaje" data-reloj-montaje></div>
+
+      <form id="task-form" class="task-form" novalidate>
+        <div class="task-form-field task-form-text-field">
+          <label for="task-input">Tarea</label>
+          <input
+            type="text"
+            id="task-input"
+            placeholder="¿Qué tienes que hacer?"
+            autocomplete="off"
+          />
+        </div>
+        <div class="task-form-field task-form-date-field">
+          <label for="due-date-input">Fecha límite <span class="req">*</span></label>
+          <input type="date" id="due-date-input" />
+        </div>
+        <div class="task-form-actions">
+          <button type="submit" id="add-button">Añadir</button>
+        </div>
+      </form>
+
+      <ul id="task-list" class="task-list"></ul>
+
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">✨</div>
+        <p>No tienes tareas pendientes 🎉</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="../datos/almacenamiento.js"></script>
+  <script src="../componentes/navegacion/navegacion.js"></script>
+  <script src="../componentes/reloj/reloj.js"></script>
+  <script src="tareas.js"></script>
+</body>
+</html>

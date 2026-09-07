@@ -1,0 +1,11 @@
+{
+  "name": "lista-de-tareas",
+  "version": "1.0.0",
+  "description": "Aplicación de lista de tareas con calendario. HTML, CSS y JS vanilla; persistencia con localStorage. Sin dependencias.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node pruebas/tests-funcionales.js"
+  },
+  "license": "MIT"
+}
