@@ -33,10 +33,12 @@
             placeholder="¿Qué tienes que hacer?"
             autocomplete="off"
           />
+          <p class="field-error" id="task-input-error" hidden></p>
         </div>
         <div class="task-form-field task-form-date-field">
           <label for="due-date-input">Fecha límite <span class="req">*</span></label>
           <input type="date" id="due-date-input" />
+          <p class="field-error" id="due-date-input-error" hidden></p>
         </div>
         <div class="task-form-actions">
           <button type="submit" id="add-button">Añadir</button>

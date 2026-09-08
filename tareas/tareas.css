@@ -69,6 +69,14 @@
   box-shadow: 0 0 0 3px rgba(255, 85, 85, 0.2);
 }
 
+.field-error {
+  color: var(--danger-color);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin: 0.15rem 0 0 0.15rem;
+}
+
 .task-form button {
   background-color: var(--accent-lime);
   color: #1A0F40;

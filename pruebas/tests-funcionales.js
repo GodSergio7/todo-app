@@ -39,6 +39,8 @@ function makeElement(tag) {
   el.querySelectorAll = () => [];
   el.appendChild = (c) => { el.children.push(c); return c; };
   el.setAttribute = (k, v) => { el.attributes[k] = v; };
+  el.getAttribute = (k) => el.attributes[k];
+  el.removeAttribute = (k) => { delete el.attributes[k]; };
   el.addEventListener = (ev, fn) => { el.listeners[ev] = fn; };
   el.dispatch = (ev, arg) => { if (el.listeners[ev]) el.listeners[ev](arg); };
   el.focus = () => {};
@@ -48,7 +50,11 @@ function makeElement(tag) {
 
 function buildDom(ids) {
   const els = {};
-  ids.forEach((id) => { els[id] = makeElement(); });
+  ids.forEach((id) => {
+    const el = makeElement();
+    el.id = id; // replica el atributo id real de cada elemento
+    els[id] = el;
+  });
   const body = makeElement('body');
   return {
     document: {
@@ -189,7 +195,7 @@ function loadTasksPage(seed) {
     removeItem: (k) => storage.delete(k),
     _map: storage
   };
-  const ids = ['task-form', 'task-input', 'due-date-input', 'task-list', 'empty-state'];
+  const ids = ['task-form', 'task-input', 'due-date-input', 'task-list', 'empty-state', 'task-input-error', 'due-date-input-error'];
   const { document, els } = buildDom(ids);
   runScripts(['../datos/almacenamiento.js', '../tareas/tareas.js'], { localStorage: localStorageMock, document });
   const form = els['task-form'];
@@ -224,6 +230,41 @@ function loadTasksPage(seed) {
   const oldData = JSON.stringify([{ id: 77, text: 'Legacy sin fecha', completed: false }]);
   const page = loadTasksPage(oldData);
   check(page.els['task-list'].children.length === 1, 'una tarea antigua sin dueDate se muestra en Tareas');
+}
+
+// Validación accesible: mensajes + aria-invalid / aria-describedby
+console.log('\n=== Página Tareas: validación accesible ===');
+{
+  const page = loadTasksPage();
+
+  // Fecha vacía -> error en el campo de fecha
+  page.submit('Tarea de prueba', '');
+  const fecha = page.els['due-date-input'];
+  const fechaError = page.els['due-date-input-error'];
+  check(fecha.getAttribute('aria-invalid') === 'true', 'sin fecha -> el campo de fecha marca aria-invalid="true"');
+  check(fecha.getAttribute('aria-describedby') === 'due-date-input-error', 'sin fecha -> aria-describedby apunta al mensaje');
+  check(fechaError.hidden === false, 'sin fecha -> el mensaje de error se muestra');
+  check(fechaError.textContent !== '', 'sin fecha -> el mensaje de error tiene texto');
+
+  // Texto vacío -> error en el campo de texto
+  page.submit('', '2026-09-10');
+  const texto = page.els['task-input'];
+  const textoError = page.els['task-input-error'];
+  check(texto.getAttribute('aria-invalid') === 'true', 'sin texto -> el campo de texto marca aria-invalid="true"');
+  check(texto.getAttribute('aria-describedby') === 'task-input-error', 'sin texto -> aria-describedby apunta al mensaje');
+  check(textoError.hidden === false && textoError.textContent !== '', 'sin texto -> el mensaje de error se muestra');
+
+  // Al corregir la fecha, el estado de error se limpia
+  page.els['due-date-input'].dispatch('change');
+  check(fecha.getAttribute('aria-invalid') === undefined, 'al corregir -> se elimina aria-invalid');
+  check(fecha.getAttribute('aria-describedby') === undefined, 'al corregir -> se elimina aria-describedby');
+  check(fechaError.hidden === true, 'al corregir -> el mensaje de error se oculta');
+
+  // Al escribir el texto, el estado de error se limpia
+  page.els['task-input'].dispatch('input');
+  check(texto.getAttribute('aria-invalid') === undefined, 'al escribir -> se elimina aria-invalid');
+  check(texto.getAttribute('aria-describedby') === undefined, 'al escribir -> se elimina aria-describedby');
+  check(textoError.hidden === true, 'al escribir -> el mensaje de error se oculta');
 }
 
 // ============================================================================

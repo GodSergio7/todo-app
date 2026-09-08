@@ -18,12 +18,42 @@ function todayISODate() {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
+// Mensajes breves por campo (el id del mensaje es "<id del campo>-error")
+const ERROR_TEXT = {
+  'task-input': 'Escribe la tarea.',
+  'due-date-input': 'Selecciona la fecha límite.'
+};
+
+function errorMessageId(input) {
+  return `${input.id}-error`;
+}
+
 function showFieldError(input) {
   input.classList.add('field-invalid');
+  input.setAttribute('aria-invalid', 'true');
+
+  const msg = document.getElementById(errorMessageId(input));
+  if (msg) {
+    msg.textContent = ERROR_TEXT[input.id] || 'Corrige este campo.';
+    msg.hidden = false;
+  }
+
+  if (!input.getAttribute('aria-describedby')) {
+    input.setAttribute('aria-describedby', errorMessageId(input));
+  }
 }
 
 function clearFieldError(input) {
   input.classList.remove('field-invalid');
+  input.removeAttribute('aria-invalid');
+
+  const msg = document.getElementById(errorMessageId(input));
+  if (msg) {
+    msg.textContent = '';
+    msg.hidden = true;
+  }
+
+  input.removeAttribute('aria-describedby');
 }
 
 // Event listener para el envío del formulario
