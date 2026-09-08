@@ -50,26 +50,45 @@ function makeElement(tag) {
 
 function buildDom(ids) {
   const els = {};
-  ids.forEach((id) => {
+  let activeEl = null;
+  const docListeners = {};
+
+  // Crea un elemento cuyo focus() actualiza el documento activo.
+  function hazEl(id) {
     const el = makeElement();
-    el.id = id; // replica el atributo id real de cada elemento
-    els[id] = el;
-  });
-  const body = makeElement('body');
-  return {
-    document: {
-      body,
-      getElementById(id) { return els[id] || null; },
-      createElement(tag) { return makeElement(tag); },
-      createTextNode(text) {
-        const n = makeElement('#text');
-        n._text = String(text);
-        n.isTextNode = true;
-        return n;
-      }
+    el.isConnected = true;
+    if (id !== undefined) el.id = id;
+    el.focus = function () { activeEl = el; };
+    el.blur = function () { if (activeEl === el) activeEl = null; };
+    return el;
+  }
+
+  ids.forEach((id) => { els[id] = hazEl(id); });
+  const body = hazEl();
+
+  const document = {
+    body,
+    get activeElement() { return activeEl; },
+    getElementById(id) { return els[id] || null; },
+    createElement(tag) { return hazEl(); },
+    createTextNode(text) {
+      const n = hazEl();
+      n._text = String(text);
+      n.isTextNode = true;
+      return n;
     },
-    els
+    addEventListener(ev, fn) {
+      if (!docListeners[ev]) docListeners[ev] = [];
+      docListeners[ev].push(fn);
+    },
+    // Dispara un evento de teclado a los listeners del documento (para Escape).
+    dispatchKey(key) {
+      const event = { key: key };
+      (docListeners.keydown || []).forEach((fn) => fn(event));
+    }
   };
+
+  return { document, els };
 }
 
 // Ejecuta varios scripts en el MISMO contexto global (como en el navegador).
@@ -283,7 +302,7 @@ function renderCalendarioMonth(seed, date) {
   };
   const ids = [
     'month-title', 'month-year', 'prev-month', 'next-month', 'today-btn',
-    'calendar-grid', 'cal-empty-note', 'modal-backdrop', 'modal-task-name',
+    'calendar-grid', 'cal-empty-note', 'modal-backdrop', 'modal-card', 'modal-task-name',
     'modal-due-date', 'modal-status', 'modal-toggle', 'modal-delete', 'modal-close'
   ];
   const { document, els } = buildDom(ids);
@@ -307,7 +326,7 @@ function renderCalendarioMonth(seed, date) {
   const monthYear = () => els['month-year']._text;
 
   return {
-    els, cells, monthTitle, monthYear, grid,
+    els, cells, monthTitle, monthYear, grid, document,
     localStorageMock, storage,
     cellByDay: function (day) {
       const cs = cells();
@@ -411,6 +430,37 @@ function renderCalendarioMonth(seed, date) {
   check(cal.els['modal-backdrop'].hidden === true, 'cerrar modal funciona');
 
   check(cal.cellByDay(30) !== null, 'el calendario sigue mostrando todos los días del mes');
+}
+
+// ============================================================================
+// ACCESIBILIDAD DEL MODAL (foco + Escape)
+// ============================================================================
+console.log('\n=== Calendario: accesibilidad del modal ===');
+{
+  const seed = JSON.stringify([
+    { id: 1, text: 'Reunión', completed: false, createdAt: '2026-09-01T10:00:00Z', dueDate: '2026-09-10' }
+  ]);
+  const cal = renderCalendarioMonth(seed, '2026-09-06');
+  const chip = cal.chipsOf(cal.cellByDay(10))[0];
+  const card = cal.els['modal-card'];
+
+  // 1) Al abrir: guarda el elemento con foco y lo mueve al diálogo.
+  chip.focus();
+  chip.dispatch('click');
+  check(cal.els['modal-backdrop'].hidden === false, 'el modal se abre al hacer clic en la tarea');
+  check(cal.document.activeElement === card, 'al abrir, el foco se mueve al diálogo del modal');
+
+  // 2) Escape cierra el modal y devuelve el foco al elemento que lo abrió.
+  cal.document.dispatchKey('Escape');
+  check(cal.els['modal-backdrop'].hidden === true, 'Escape cierra el modal');
+  check(cal.document.activeElement === chip, 'Escape devuelve el foco al elemento que abrió el modal');
+
+  // 3) Cerrar con el botón X también restaura el foco.
+  chip.focus();
+  chip.dispatch('click');
+  cal.els['modal-close'].dispatch('click');
+  check(cal.els['modal-backdrop'].hidden === true, 'el botón de cierre cierra el modal');
+  check(cal.document.activeElement === chip, 'el botón de cierre devuelve el foco al elemento que abrió el modal');
 }
 
 // ============================================================================

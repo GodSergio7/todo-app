@@ -15,6 +15,7 @@ const calEmptyNote = document.getElementById('cal-empty-note');
 
 // Modal
 const modalBackdrop = document.getElementById('modal-backdrop');
+const modalCardEl = document.getElementById('modal-card');
 const modalTaskName = document.getElementById('modal-task-name');
 const modalDueDate = document.getElementById('modal-due-date');
 const modalStatus = document.getElementById('modal-status');
@@ -27,6 +28,8 @@ let viewYear = new Date().getFullYear();
 let viewMonth = new Date().getMonth();
 // Tarea abierta en el modal (id o null)
 let modalTaskId = null;
+// Elemento que tenía el foco antes de abrir el modal (para restaurarlo al cerrar)
+let lastFocusedElement = null;
 
 const MESES = [
   'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
@@ -190,6 +193,11 @@ function taskById(id) {
 function openModal(id) {
   const task = taskById(id);
   if (!task) return;
+
+  // Guardar el elemento que tenía el foco para restaurarlo al cerrar.
+  const activo = document.activeElement;
+  lastFocusedElement = (activo && typeof activo.focus === 'function') ? activo : null;
+
   modalTaskId = id;
 
   modalTaskName.textContent = task.text;
@@ -200,12 +208,22 @@ function openModal(id) {
 
   modalBackdrop.hidden = false;
   document.body.style.overflow = 'hidden';
+
+  // Mover el foco al diálogo para que la navegación por teclado entre en el modal.
+  if (modalCardEl) modalCardEl.focus();
 }
 
 function closeModal() {
   modalBackdrop.hidden = true;
   modalTaskId = null;
   document.body.style.overflow = '';
+
+  // Devolver el foco al elemento que abrió el modal, si sigue en el documento.
+  const prev = lastFocusedElement;
+  lastFocusedElement = null;
+  if (prev && typeof prev.focus === 'function' && prev.isConnected !== false) {
+    prev.focus();
+  }
 }
 
 function refreshModal() {
@@ -230,6 +248,13 @@ modalToggleBtn.addEventListener('click', () => {
 
 modalDeleteBtn.addEventListener('click', () => {
   if (modalTaskId !== null) TaskStore.remove(modalTaskId);
+});
+
+// Cerrar el modal con la tecla Escape (solo mientras esté abierto)
+document.addEventListener('keydown', (e) => {
+  if (modalTaskId !== null && (e.key === 'Escape' || e.key === 'Esc')) {
+    closeModal();
+  }
 });
 
 // Repintar calendario y modal cuando cambian los datos (desde cualquier página)
