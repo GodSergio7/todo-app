@@ -14,6 +14,8 @@
   let tasks = [];
   // Suscriptores: funciones que se llaman tras cualquier cambio de datos
   const listeners = [];
+  // Suscriptores de error de guardado: se llaman si localStorage falla al guardar
+  const saveErrorListeners = [];
 
   // Contador interno para ids únicos ante creaciones simultáneas
   let lastGeneratedId = 0;
@@ -24,11 +26,20 @@
     });
   }
 
+  function notifySaveError(error) {
+    saveErrorListeners.forEach((fn) => {
+      try { fn(error); } catch (e) { console.error(e); }
+    });
+  }
+
   function save() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      return true;
     } catch (error) {
       console.error('No se pudieron guardar las tareas en localStorage:', error);
+      notifySaveError(error);
+      return false;
     }
   }
 
@@ -83,6 +94,16 @@
       return function () {
         const i = listeners.indexOf(fn);
         if (i !== -1) listeners.splice(i, 1);
+      };
+    },
+
+    // Suscripción a errores al guardar (localStorage no disponible/lleno).
+    // Devuelve función para cancelarla.
+    onSaveError: function (fn) {
+      saveErrorListeners.push(fn);
+      return function () {
+        const i = saveErrorListeners.indexOf(fn);
+        if (i !== -1) saveErrorListeners.splice(i, 1);
       };
     },
 

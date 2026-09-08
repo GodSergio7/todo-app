@@ -433,6 +433,58 @@ console.log('\n=== Calendario: límite de chips por día ===');
   check(textosD11.indexOf('D11-d') === -1, 'la 4ª tarea del día no se renderiza como chip');
 }
 
+// ============================================================================
+// PERSISTENCIA: error de guardado en localStorage (modo privado / cuota llena)
+// ============================================================================
+console.log('\n=== Persistencia: fallo de guardado en localStorage ===');
+
+// Simula que localStorage no permite escribir (p. ej. cuota llena o privado).
+function storageQueFallaEnEscritura() {
+  return {
+    getItem: () => null,
+    setItem: () => { throw new Error('QuotaExceededError'); },
+    removeItem: () => {},
+    clear: () => {}
+  };
+}
+
+{
+  // 1) A nivel de TaskStore: onSaveError se notifica y add() no lanza.
+  const sb = runScripts(['../datos/almacenamiento.js'], { localStorage: storageQueFallaEnEscritura() });
+  const store = sb.TaskStore;
+  let erroresNotificados = 0;
+  store.onSaveError(() => { erroresNotificados++; });
+
+  let lanzado = false;
+  try {
+    store.add('Tarea que no puede guardarse', '2026-09-10');
+  } catch (e) {
+    lanzado = true;
+  }
+
+  check(lanzado === false, 'un fallo de guardado no propaga una excepción al flujo normal');
+  check(erroresNotificados === 1, 'TaskStore.onSaveError se notifica cuando setItem falla');
+}
+
+{
+  // 2) A nivel de UI: aviso.js crea un elemento role="alert" con el mensaje.
+  const { document } = buildDom([]);
+  const sb = runScripts(
+    ['../datos/almacenamiento.js', '../componentes/aviso/aviso.js'],
+    { localStorage: storageQueFallaEnEscritura(), document }
+  );
+
+  // Provocar un guardado fallido tras la carga del componente.
+  sb.TaskStore.add('Otra tarea que no puede guardarse', '2026-09-11');
+
+  const aviso = document.body.children.find(
+    (c) => (c.attributes || {}).role === 'alert'
+  );
+  check(!!aviso, 'aviso.js añade al DOM un elemento con role="alert"');
+  check(aviso && aviso._text.indexOf('No se pudieron guardar') !== -1,
+    'el aviso muestra un mensaje de error legible');
+}
+
 console.log(fails === 0
   ? '\nRESULTADO: TODAS LAS PRUEBAS PASARON ✔'
   : `\nRESULTADO: ${fails} PRUEBA(S) FALLARON ✘`);

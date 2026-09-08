@@ -269,3 +269,37 @@ body {
     margin-top: 0.3rem;
   }
 }
+
+/* ============================================================= */
+/* Aviso global (error de persistencia)                          */
+/* ============================================================= */
+
+/* Banner no intrusivo: aparece abajo centrado solo cuando hay un error
+   de guardado. Oculto por defecto (fuera de pantalla y transparente). */
+#aviso-global {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translate(-50%, 200%);
+  z-index: 300;
+  max-width: min(90vw, 480px);
+  background: rgba(30, 18, 70, 0.97);
+  border: 1px solid var(--danger-color);
+  color: var(--text-primary);
+  padding: 0.8rem 1.1rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#aviso-global.visible {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
