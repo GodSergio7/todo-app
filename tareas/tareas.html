@@ -11,8 +11,12 @@
   <link rel="stylesheet" href="../estilos/estilos-globales.css">
   <link rel="stylesheet" href="tareas.css">
 </head>
-<body>
+<body class="page-tareas">
   <div class="bg-glow"></div>
+
+  <header class="site-header">
+    <span class="site-title">¿Qué hay que hacer hoy?</span>
+  </header>
 
   <div class="container container-tareas">
     <header class="app-header">
@@ -45,14 +49,20 @@
         </div>
       </form>
 
-      <ul id="task-list" class="task-list"></ul>
+      <div class="task-list-zone">
+        <ul id="task-list" class="task-list"></ul>
 
-      <div id="empty-state" class="empty-state">
-        <div class="empty-icon">✨</div>
-        <p>No tienes tareas pendientes 🎉</p>
+        <div id="empty-state" class="empty-state">
+          <div class="empty-icon">✨</div>
+          <p>No tienes tareas pendientes 🎉</p>
+        </div>
       </div>
     </main>
   </div>
+
+  <footer class="site-footer">
+    <p>© 2026 ¿Qué hay que hacer hoy? · Todos los derechos reservados</p>
+  </footer>
 
   <script src="../datos/almacenamiento.js"></script>
   <script src="../componentes/aviso/aviso.js"></script>

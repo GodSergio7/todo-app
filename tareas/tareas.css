@@ -132,12 +132,13 @@
   }
 }
 
-.task-item:hover {
+/* POR AHORA QUITADO */
+/* .task-item:hover {
   background-color: var(--bg-card-hover);
   border-color: rgba(200, 255, 61, 0.3);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
+} */
 
 .task-item.completed {
   opacity: 0.55;
@@ -266,5 +267,60 @@
 
   .task-form-actions button {
     flex: 1;
+  }
+}
+
+/* ============================================================= */
+/* Formulario fijo en el centro de la pantalla                   */
+/* La lista de tareas se desplaza por debajo, sin mover el       */
+/* formulario. La página ocupa todo el alto y no hace scroll.    */
+/* ============================================================= */
+
+.page-tareas {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.container-tareas {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.container-tareas .app-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.container-tareas .task-form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(476px, calc(100vw - 4rem));
+  margin-bottom: 0;
+  z-index: 5;
+}
+
+.task-list-zone {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(476px, calc(100vw - 4rem));
+  top: calc(50% + 52px);
+  bottom: 1rem;
+  overflow-y: auto;
+  padding-bottom: 0.5rem;
+}
+
+@media (max-width: 680px) {
+  .task-list-zone {
+    top: calc(50% + 118px);
   }
 }
