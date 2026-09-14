@@ -122,6 +122,11 @@
   background: #2a6a4a;
 }
 
+/* Las notas usan un color propio (lavanda) para distinguirse de las tareas */
+.dot-nota {
+  background: var(--accent-note);
+}
+
 .cal-legend-mobile {
   display: flex;
   justify-content: center;
@@ -234,6 +239,14 @@
 
 .cal-chip-done:hover {
   background: rgba(200, 255, 61, 0.28);
+}
+
+/* Chip de nota: mismo formato que los chips de tarea pero con color propio
+   (lavanda). Es informativo, no abre el modal de tareas. */
+.cal-chip-nota {
+  background: var(--accent-note);
+  color: #1b1235;
+  cursor: default;
 }
 
 .cal-more {

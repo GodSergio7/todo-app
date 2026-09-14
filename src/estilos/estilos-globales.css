@@ -18,6 +18,8 @@
   --border-focus: #C8FF3D;
   --danger-color: #FF5555;
   --danger-bg-hover: rgba(255, 85, 85, 0.15);
+  --accent-note: #AA8CFF;
+  --accent-note-hover: #9B7AFF;
   --radius-lg: 20px;
   --radius-md: 12px;
   --radius-sm: 8px;
@@ -30,6 +32,13 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+/* #root es el punto de montaje de React. Con display:contents no genera caja,
+   de modo que sus hijos (cabecera, contenedor y pie) se comportan como hijos
+   directos de body y se conserva exactamente el layout flex original. */
+#root {
+  display: contents;
 }
 
 /* El atributo hidden debe ocultar siempre, incluso si el elemento tiene un

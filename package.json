@@ -1,11 +1,23 @@
 {
   "name": "lista-de-tareas",
-  "version": "1.0.0",
-  "description": "Aplicación de lista de tareas con calendario. HTML, CSS y JS vanilla; persistencia con localStorage. Sin dependencias.",
-  "main": "server.js",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Aplicación de lista de tareas con calendario. Migrada a React + Vite; persistencia con localStorage y capa de datos lista para Supabase.",
   "scripts": {
-    "start": "node server.js",
-    "test": "node pruebas/tests-funcionales.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
   },
   "license": "MIT"
 }
