@@ -96,8 +96,8 @@ export default function Notas() {
         <section className="notes-list-col" aria-label="Lista de notas">
           {notes.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-icon">📝</div>
-              <p>No tienes notas todavía</p>
+              {/* <div className="empty-icon">📝</div> */}
+              <p>No tienes notas todavía...</p>
             </div>
           ) : (
             <div className="notes-grid">

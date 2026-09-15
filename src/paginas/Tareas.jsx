@@ -58,7 +58,7 @@ export default function Tareas() {
             ref={textRef}
             type="text"
             id="task-input"
-            placeholder="¿Qué tienes que hacer?"
+            placeholder="Tarea..."
             autoComplete="off"
             value={text}
             className={errors['task-input'] ? 'field-invalid' : undefined}

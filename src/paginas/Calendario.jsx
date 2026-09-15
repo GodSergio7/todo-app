@@ -232,11 +232,11 @@ export default function Calendario() {
         <span className="legend-item"><span className="legend-dot dot-nota"></span> Nota</span>
       </div>
 
-      {mesVacio && (
+      {/* {mesVacio && (
         <div id="cal-empty-note" className="cal-empty-note">
           No hay tareas ni notas para este mes.
         </div>
-      )}
+      )} */}
 
       {modalTask && (
         <div
